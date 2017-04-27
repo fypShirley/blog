@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+{% block main %}
+
+<h3>文章管理 <small>>添加文章</small></h3>
+
+<form method="post">
+  <span>标题</span>
+  <input type="text" name="title" value="{{content.title}}"/>
+  <span>分类</span>
+  <select name="category"  >
+    {% for category in categories %}
+
+      {% if category.name==content.category.name %}
+        <option value="{{category._id.toString()}}" selected="selected">{{category.name}}</option>
+        {% else %}
+        <option value="{{category._id.toString()}}">{{category.name}}</option>
+      {% endif %}
+
+    {% endfor %}
+  </select>
+  <button type="submit">提交</button><br/>
+  <span style="line-height: 30px;">内容摘要</span><br/>
+  <textarea name="description" id="description" cols="150" rows="3">{{content.description}}</textarea>
+  <span style="line-height: 20px;">正文</span><br/>
+  <textarea name="content" id="article-content" cols="150" rows="30">{{content.content}}</textarea>
+</form>
+
+
+{% endblock %}

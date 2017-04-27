@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <title></title>
+  <link rel="stylesheet" href="/public/css.css"/>
+</head>
+<body>
+{%include 'article_layout.html'%}
+
+  {% if userInfo._id %}
+      <nav>
+
+          {% if userInfo.isAdmin %}
+          <a href="javascript:;">仅供注册用户查看</a>
+          {% else %}
+            <ul class="navSide">
+              {% for tmp in categoies %}
+              <li>
+                <a href="/article?category={{tmp._id.toString()}}">{{tmp.name}}</a>
+
+              </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+
+      </nav>
+
+  {% else %}
+    <div class="banner-wrap">
+      <div id="register">
+        <h3>注册</h3>
+        <span>用户：<input type="text" name="username"/></span><span class="uname"></span><br/>
+        <span>密码：<input type="password" name="password"/></span><span class="pwd"></span><br/>
+        <span>确认：<input type="password" name="repassword"/></span><span class="repwd"></span><br/>
+        <span><input type="button" class="submit" value="提交"/></span>
+        <span>已有账号？马上 <a href="javascript:;">登录</a></span>
+      </div>
+
+
+      <div id="login" style="display: none">
+        <h3>登录</h3>
+        <span>用户：<input type="text"/></span><span class="uLogin"></span><br/>
+        <span>密码：<input type="password"/></span><span class="pLogin"></span><br/>
+        <span><input type="button"  class="submit" value="提交"/></span>
+        <span>没有账号？马上 <a href="javascript:;">注册</a></span>
+      </div>
+    </div>
+  {% endif %}
+</body>
+<script src="/public/jquery-1.11.1.min.js"></script>
+<script src="/public/jquery.md5.js"></script>
+<script>
+  $(function(){
+    $('#register a').click(function(){
+        $('#login').show();
+        $('#register').hide();
+    });
+
+
+    $('#login a').click(function(){
+        $('#register').show();
+        $('#login').hide();
+    })
+
+    //注册，ajax提交
+    $('#register .submit').click(function(){
+      var username=$('#register').find('[name="username"]').val();
+      var password=$('#register').find('[name="password"]').val();
+      var repassword=$('#register').find('[name="repassword"]').val();
+
+      if(username==''){
+          $('.uname').html('用户名不能为空！');
+      }else if(password==''){
+          $('.pwd').html('密码不能为空！');
+          $('.uname').empty();
+      }else if(repassword==''){
+          $('.repwd').html('请确认密码！');
+          $('.uname').empty();
+          $('.pwd').empty();
+      }else if(password!=repassword){
+          $('.repwd').html('两次密码不一致！');
+          $('.uname').empty();
+          $('.pwd').empty();
+      }else{
+        $.ajax({
+          type:'post',
+          url:'/api/user/register',
+          data:{
+            username:username,
+            password:$.md5(password),
+            repassword:$.md5(repassword)
+          },
+          dataType:'json',
+          success:function(data){
+            alert(data.message);
+            if(!data.code){
+              //注册成功
+              $('#register').slideUp(1000,function(){
+                $('#login').show();
+              });
+            }
+
+          }
+        });
+      }
+
+
+    });
+
+    //登录，ajax提交
+    $('#login .submit').click(function(){
+      var username=$('#login').find('[type="text"]').val();
+      var password=$('#login').find('[type="password"]').val();
+      if(username==''){
+        $('.uLogin').html('用户名不能为空！');
+      }else if(password==''){
+        $('.pLogin').html('密码不能为空！');
+        $('.uLogin').empty();
+      }else{
+        $.ajax({
+          type:'post',
+          url:'/api/user/login',
+          data:{
+            username:username,
+            password:$.md5(password)
+          },
+          dataType:'json',
+          success:function(data){
+//          alert(data.message);
+            if(!data.code){
+              window.location.reload();
+            }
+          }
+        });
+      }
+
+    });
+    $('#admin').on('click',function(){
+      window.location='admin';
+      console.log('进入管理');
+    })
+    $('#logout').click(function(){
+      console.log('推出');
+      $.ajax({
+        type:'get',
+        url:'/api/user/logout',
+        success:function(data){
+          if(!data.code){
+            window.location='/';
+          }
+        }
+      });
+    })
+
+  })
+
+</script>
+</html>

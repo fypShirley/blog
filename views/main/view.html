@@ -1,0 +1,215 @@
+{% extends 'article_layout.html' %}
+{% block main %}
+<div>
+  {%include 'nav.html'%}
+</div>
+
+  <h1>详细介绍</h1>
+
+  <div class='desBox'>
+    <div class="description">
+      <div class="title">{{data.contents.title}} ({{data.contents.category.name}})</div><!--标题-->
+      <div>
+        <span>作者：{{data.contents.user.username}}</span>&nbsp;&nbsp;&nbsp; <!--作者-->
+        发布时间：{{data.contents.date}}<!--时间-->
+      </div>
+      <p><span>简介：</span>{{data.contents.description}}</p><!--简介-->
+      <p>{{data.contents.content}}</p><!--正文-->
+
+    </div>
+  </div>
+
+  <!--评论-->
+<div id="comment">
+  <form method="post">
+    <span style="line-height: 30px;">评论</span> 共<span id="commentsNum"></span> 条<br/>
+    <input type="hidden" id="commentId" name="contentId" value="{{data.contents._id.toString()}}"/>
+    <textarea name="content" id="description" cols="150" rows="3" >
+
+    </textarea><br/>
+
+    {% if userInfo._id %}
+    <button type="submit" id="msgComment">提交</button><br/>
+    {% else %}
+    <p style="text-align: center;margin-top:15px;">你还没有登录 <a href="/">点击登录</a></p>
+    {% endif %}
+
+  </form>
+  <div id="commentList">
+    <ul class="comUl"></ul>
+    <button class="btn btn-block btn-danger" id="loadMore">没有更多</button>
+  </div>
+</div>
+<script>
+  /*function Comment(arr){
+    var comUl=$('.comUl');
+    comUl.empty();
+    for(var i=0;i<arr.length;i++){
+      comUl.append(
+        '<li>'+
+          '<p class="comments-user">'+
+            '<span>'+arr[i].username+'</span>'+
+            '<i>'+arr[i].postTime+'</i>'+
+          '</p>'+
+          '<span>'+arr[i].content+'</span>'+
+        '</li>'
+      );
+    }
+    return comUl;
+  }*/
+  /*$('#msgComment').click(function(){
+    $.ajax({
+      type:'POST',
+      url:'/api/comment/post',
+      data:{
+        contentId:$('#commentId').val(),
+        content:$('#description').val()
+      },
+      success:function(responseData){
+        alert(responseData.message);
+        var arr=responseData.data.comments;
+//        $('#commentList').html(Comment(arr));
+        $('#description').val('');
+        $('#commentsNum').html(arr.length);
+      }
+    });
+    return false;
+  })*/
+
+
+  /*$.ajax({
+    type:'GET',
+    url:'/api/comment',
+    data:{
+      contentId:$('#commentId').val(),
+      content:$('#description').val()
+    },
+    success:function(responseData){
+      var arr=responseData.data.comments;
+      $('#commentList').html(Comment(arr));
+      $('#description').val('');
+      $('#commentsNum').html(arr.length);
+    }
+  });*/
+
+
+
+  function Comments(){
+    this.count=1;
+    this.comments=0;
+  }
+  Comments.prototype.getComment=function(arr){
+    var innerHtml='';
+    this.comments=arr.length;//评论总数
+    for(var i=0;i<arr.length;i++){
+      var m=i;
+      innerHtml+=
+        '<li data-index='+(m+1)+'>'+
+          '<p class="comments-user">'+
+          '<span>'+arr[i].username+'</span>'+
+          '<i>'+arr[i].postTime+'</i>'+
+          '</p>'+
+          '<span>'+arr[i].content+'</span>'+
+        '</li>';
+    }
+    return innerHtml;
+  }
+  Comments.prototype.resetComment=function(limit){
+    this.count=1;
+    this.comments=$('.comUl').children().length;//获取评论总数
+    $('#loadMore').unbind('click');
+    if(this.comments<limit){
+      $('#loadMore').text('....没有更多了');
+    }else{
+      $('#loadMore').text('加载更多');
+      $('#loadMore').attr({'class':'btn btn-block btn-success'});
+
+    }
+    for(var i=limit+1;i<=this.comments;i++){
+//      if(i>limit){//超过limit之后不显示
+        $('.comUl').find('[data-index='+ i.toString()+']').css('display','none');
+//      }
+    }
+  }
+
+  //点击加载按钮，根据点击计数加载评论
+  Comments.prototype.loadComment=function(limit){
+    var current=this;
+    $('#loadMore').click(function(){
+      if( (current.count+1)*limit >= current.comments){
+        $(this).text('...没有了');
+        $(this).attr({'class':'btn btn-block btn-danger'});
+      }
+      current.count++;
+//      for(var i=1;i<=current.comments;i++){
+      for(var i=(current.count-1)*limit+1;i<=(current.count)*limit;i++){
+//        if(current.count<i*current.count && i<=(current.count)*limit){
+          $('.comUl').find('[data-index='+ i.toString()+']').slideDown(300);
+//        }
+      }
+    });
+  }
+
+  $(function(){
+    $.ajax({
+      type:'GET',
+      url:'/api/comment',
+      data:{
+        contentId:$('#commentId').val(),
+        content:$('#description').val()
+      },
+      success:function(responseData){
+        console.log(responseData);
+        if(responseData.data){
+          var arr=responseData.data.comments;
+          //渲染论文的必要方法
+          var renderCom=new Comments();
+
+          //获取评论内容
+          $('.comUl').html(renderCom.getComment(arr));
+
+          //清空评论框
+          $('#description').val('');
+
+          //展开评论条数
+          $('#commentsNum').html(arr.length);
+
+          //首次加载展开三条，每点击一次加载3条
+          renderCom.resetComment(3);
+          renderCom.loadComment(3);
+        }
+
+
+        //  评论提交
+        $('#msgComment').click(function(){
+          $.ajax({
+            type:'POST',
+            url:'/api/comment/post',
+            data:{
+              contentId:$('#commentId').val(),
+              content:$('#description').val()
+            },
+            success:function(responseData){
+              if(responseData.data){
+                console.log(responseData);
+                alert(responseData.message);
+                var arr=responseData.data.comments;
+                $('.comUl').html(renderCom.getComment(arr));
+                $('#description').val('');
+                $('#commentsNum').html(arr.length);
+
+                renderCom.resetComment(3);
+                renderCom.loadComment(3);
+              }
+
+            }
+          });
+          return false;
+        });
+
+      }
+    });
+  })
+</script>
+
+{% endblock %}

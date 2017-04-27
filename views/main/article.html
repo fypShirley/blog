@@ -1,0 +1,25 @@
+{% extends 'article_layout.html' %}
+{% block main %}
+
+{%include 'nav.html'%}
+
+<h1>文章文章文章</h1>
+
+{% for tmp in data.contents %}
+  <div class='desBox'>
+    <div class="articleName"><!--类别-->
+      {{tmp.category.name}}
+    </div>
+
+
+    <div class="description">
+      <div class="title">{{tmp.title}} <a href="/view?contentId={{tmp._id.toString()}}">(查看全文)</a></div><!--标题-->
+      <span>{{tmp.user.username}}</span><!--作者-->
+      <p><span>简介：</span>{{tmp.description}}</p><!--简介-->
+      <div class="desTime">发布时间：{{tmp.date}}</div><!--时间-->
+    </div>
+  </div>
+{% endfor %}
+
+{%include 'article_page.html'%}
+{% endblock %}

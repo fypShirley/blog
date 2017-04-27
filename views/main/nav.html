@@ -1,0 +1,47 @@
+<!--aside-->
+<div class="category">
+  <form method="post">
+    <input type="text" name="description" placeholder="关键字搜索" id="keywords"/>
+    <button type="submit" id="keyWord">提交</button><br/>
+  </form>
+  <ul>
+    <!--分类高亮显示的判断-->
+    {% if data.category=='' %}
+    <li><a style="color: red;" href="/article">全部文章</a></li>
+    {% else %}
+    <li><a href="/article">全部文章</a></li>
+    {% endif %}
+
+
+    {% for tmp in data.categories %}
+
+    {% if tmp._id.toString()==data.category.toString() %}
+    <li>
+      <a style=" color: red;" href="/article?category={tmp._id.toString()}">{{tmp.name}}</a>
+    </li>
+    {% else %}
+    <li>
+      <a href="/article?category={{tmp._id.toString()}}">{{tmp.name}}</a>
+    </li>
+    {% endif %}
+    {% endfor %}
+  </ul>
+</div>
+<script>
+  $('#keyWord').click(function(){
+    console.log('点击事件触发');
+    $.ajax({
+      type:'POST',
+      url:'/api/keywords',
+      data:{
+        description:$('#keywords').val()
+      },
+      success:function(responseData){
+        if(responseData.data){
+          console.log('前台数据'+responseData);
+        }
+
+      }
+    })
+  })
+</script>

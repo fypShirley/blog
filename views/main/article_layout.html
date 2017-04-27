@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <title></title>
+  <link rel="stylesheet" href="/public/css.css"/>
+  <link rel="stylesheet" href="/public/bootstrap.css"/>
+  <script src="/public/jquery-1.11.1.min.js"></script>
+</head>
+<body>
+
+<nav class="navbar">
+  <ul>
+    <li><a href="/">首页</a></li>
+    <li><a href="/article">全部文章</a></li>
+    <li><a href="/content/add">添加新的文章</a></li>
+    <li><a href="about.html">关于</a></li>
+
+    <li>
+      {% if userInfo.isAdmin %}
+      <a id="admin" style="cursor:pointer;">管理员你好，进入管理</a>
+      {% else %}
+      <span>{{userInfo.username}}</span>
+      {% endif %}
+
+    </li>
+
+    <li>
+      {% if userInfo._id %}
+      <a  id="logout" href="javascript:;">注销</a>
+      {% else %}
+      <a  id="navLogin" href="/">登录</a>
+      {% endif %}
+
+    </li>
+  </ul>
+</nav>
+
+<div class="artContainer">
+  {% block main %}{% endblock %}
+</div>
+
+
+<script>
+  $('#logout').click(function(){
+    console.log('推出');
+    $.ajax({
+      type:'get',
+      url:'/api/user/logout',
+      success:function(data){
+        if(!data.code){
+          window.location='/';
+        }
+      }
+    });
+  })
+</script>
+</body>
+</html>

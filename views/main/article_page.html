@@ -1,0 +1,33 @@
+<!--分页-->
+<div class="navpage">
+  <ul class="pagination">
+    {% if data.pages>0 %}<!--不止1页-->
+      {% if data.pages>1 %}
+      <li>
+        <a href="/article?category={{data.category.toString()}}&page=1">第一页</a>
+      </li>
+      {% endif %}
+
+      {% if data.page-1!=0 %}
+      <li>
+        <a href="/article?category={{data.category.toString()}}&page={{data.page-1}}">上一页</a>
+      </li>
+      {% endif %}
+
+      {% if data.page+1 <=data.pages %}
+      <li>
+        <a href="/article?category={{data.category.toString()}}&page={{data.page+1}}">下一页</a>
+      </li>
+      {% endif %}
+
+      {% if data.pages>1 %}
+      <li>
+        <a href="/article?category={{data.category.toString()}}&page={{data.pages}}">最后页</a>
+      </li>
+      {% endif %}
+
+    {% else %}
+    <li style="width: 100%;text-align: center;">当前分类没有任何文章！</li>
+    {% endif %}
+  </ul>
+</div>

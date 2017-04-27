@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <title>个人博客系统</title>
+  <link rel="stylesheet" href="/public/css.css"/>
+  <link rel="stylesheet" href="/public/bootstrap.css"/>
+</head>
+<body>
+<div class="navTop">
+  <p class="blog">博客系统</p>
+  <p class="blogUser">
+
+    {% if userInfo.isAdmin %}
+    <span id="admin" style="cursor:pointer;">你好，管理员</span>
+    {% else %}
+    <span>你好，{{userInfo.username}}</span>
+    {% endif %}
+
+    <a href="javascript:;" id="logout">退出</a>
+  </p>
+</div>
+
+<aside class="aside">
+  <ul>
+    <li><a href="/">首页</a></li>
+    <li><a href="javascript:;">设置</a></li>
+    <li><a href="/admin/user">用户管理</a></li>
+    <li id="category">
+      <a href="javascript:;" >分类管理</a>
+      <ul class="dropdown"style="display: none">
+        <li><a href="/admin/category">管理首页</a></li>
+        <li><a href="/admin/category/add">添加分类</a></li>
+      </ul>
+    </li>
+    <li><a href="/admin/content">文章管理</a></li>
+    <li><a href="javascript:;">评论管理</a></li>
+  </ul>
+</aside>
+<section class="containers">
+  {% block main %}{% endblock %}
+</section>
+<footer></footer>
+<script src="/public/jquery-1.11.1.min.js"></script>
+
+<script>
+
+  $('#category').hover(function(){
+    $(this).find('.dropdown').stop().slideDown(400);
+  },function(){
+    $(this).find('.dropdown').stop().slideUp(400);
+  });
+  // 注销模块
+  $('#logout').click(function(){
+    console.log('推出');
+    $.ajax({
+      type:'get',
+      url:'/api/user/logout',
+      success:function(data){
+        if(!data.code){
+          window.location='/';
+        }
+      }
+    });
+  })
+
+</script>
+</body>
+</html>

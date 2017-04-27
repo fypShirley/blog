@@ -1,0 +1,30 @@
+{% extends 'article_layout.html' %}
+{% block main %}
+
+{% if userInfo._id %}
+<h3>文章管理 <small>>添加文章</small></h3>
+
+<form method="post">
+  <span>标题</span>
+  <input type="text" name="title"/>
+  <span>分类</span>
+  <select name="category" >
+    {% for category in categories %}
+    <option value="{{category._id.toString()}}">{{category.name}}</option>
+    {% endfor %}
+  </select>
+  <button type="submit">提交</button><br/>
+  <span style="line-height: 30px;">内容摘要</span><br/>
+  <textarea name="description" id="description" cols="150" rows="3" placeholder="请输入简介"></textarea>
+  <span style="line-height: 20px;">正文</span><br/>
+  <textarea name="content" id="article-content" cols="150" rows="30" placeholder="请输入正文"></textarea>
+</form>
+{% else %}
+<p style="text-align: center;margin-top:15px;">你还没有登录 <a href="/">点击登录</a></p>
+{% endif %}
+
+
+
+
+
+{% endblock %}
